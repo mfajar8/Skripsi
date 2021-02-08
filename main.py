@@ -1,8 +1,15 @@
 import csv
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import minmax_scale
 from sklearn.model_selection import train_test_split # Import train_test_split function
-
+import random
+import os
+from lib.rsvm.trainer import Trainer
+from lib.rsvm.predictor import Predictor
+import pickle
+from statistics import mean
+import sys
 
 # fungsi untuk mengambil dataset (lokasi file sejajar dengan file main.py)
 def open_dataset():
@@ -72,14 +79,26 @@ if __name__ == "__main__":
     print("dataset normalisasi")
     check_dataset(normalisasi)
 
-    normalisasi_pd = pd.DataFrame(normalisasi)# conver ke pandas
+    normalisasi_pd = pd.DataFrame(normalisasi)# convert ke pandas
+
     # Split dataset into training set and test set
     # Separating the target variable 
     X = normalisasi_pd.values[:, 0:7] 
     Y = normalisasi_pd.values[:, 8]
 
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2,random_state=100) # 70% training and 30% test
+    
+    # for row in X_train :
+    #     print(row)
+    
+    # print("=============")
+    X_train = np.column_stack((X_train, y_train.astype(int)))
 
-
-
-        
+    # for row in X_train :
+    #     print(row)
+    # sys.exit()
+    trainer = Trainer(X_train, 7)
+    trainer.make(r = 0.1, v = 5)
+    trainer.tune(c = 100, g = 0.0001, k = 0, s = 0)
+    trainer.train()
+    model = trainer.set_model()
