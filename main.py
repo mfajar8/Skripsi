@@ -11,6 +11,7 @@ import pickle
 from statistics import mean
 import sys
 import joblib
+from imblearn.over_sampling import SMOTE
 
 # fungsi untuk mengambil dataset (lokasi file sejajar dengan file main.py)
 def open_dataset():
@@ -88,7 +89,24 @@ if __name__ == "__main__":
     Y = normalisasi_pd.values[:, 8]
 
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2,random_state=100) # 80% training and 30% test
-    trainer = Trainer(X_train, y_train)
+
+    # for row in y_train :
+    #     print(row)
+    # print("------------------------------")
+    X_train = np.column_stack((X_train, y_train.astype(int)))
+
+    smote = SMOTE(random_state = 101)
+    X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
+
+    print("Jumlah Xtrain", len(X_train))
+    print("Jumlah Ytrain", len(y_train))
+    print("Jumlah Xoversample", len(X_oversample))
+    print("Jumlah Yoversample", len(y_oversample))
+    sys.exit()
+    # for row in X_train :
+    #     print(row)
+    # sys.exit()
+    trainer = Trainer(X_train, 7)
     trainer.make(r = 0.1, v = 5)
     trainer.tune(c = 100, g = 0.0001, k = 1, s = 0)
     trainer.train()
