@@ -85,30 +85,59 @@ if __name__ == "__main__":
 
     # Split dataset into training set and test set
     # Separating the target variable 
-    X = normalisasi_pd.values[:, 0:7] 
+    X = normalisasi_pd.values[:, 0:8] 
     Y = normalisasi_pd.values[:, 8]
 
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2,random_state=100) # 80% training and 30% test
 
-    # for row in y_train :
-    #     print(row)
-    # print("------------------------------")
-    X_train = np.column_stack((X_train, y_train.astype(int)))
-
     smote = SMOTE(random_state = 101)
-    X_oversample, y_oversample = smote.fit_resample(X_train, y_train)
+    X_oversample, y_oversample = smote.fit_resample(X_train, y_train)  # proses smote
 
     print("Jumlah Xtrain", len(X_train))
     print("Jumlah Ytrain", len(y_train))
     print("Jumlah Xoversample", len(X_oversample))
     print("Jumlah Yoversample", len(y_oversample))
-    sys.exit()
+
+    jumlah_1 = 0
+    for x in y_train:
+        if x == 1 :
+            jumlah_1 = jumlah_1 + 1
+
+    print("jumlah Xtrain_1" , jumlah_1)
+
+    jumlah_1 = 0
+    for x in y_train:
+        if x == 0 :
+            jumlah_1 = jumlah_1 + 1
+
+    print("jumlah Xtrain_0" , jumlah_1)
+
+    jumlah_1 = 0
+    for x in y_oversample:
+        if x == 1 :
+            jumlah_1 = jumlah_1 + 1
+
+    print("jumlah Xsample_1" , jumlah_1)
+
+
+    jumlah_1 = 0
+    for x in y_oversample:
+        if x == 0 :
+            jumlah_1 = jumlah_1 + 1
+
+    print("jumlah Xsample_0" , jumlah_1)
+
+    X_train = np.column_stack((X_oversample, y_oversample.astype(int)))  # menggabungkan feature(x) dengan class(y) dalam 1 array
+    
+    # sys.exit()
     # for row in X_train :
     #     print(row)
     # sys.exit()
-    trainer = Trainer(X_train, 7)
+
+    # proses rsvs
+    trainer = Trainer(X_train, 8)
     trainer.make(r = 0.1, v = 5)
-    trainer.tune(c = 100, g = 0.0001, k = 1, s = 0)
+    trainer.tune(c = 100, g = 0.0001, k = 0, s = 0)
     trainer.train()
     accuracy = sum(trainer.get_accuracy()[0])/5
     print(accuracy)
